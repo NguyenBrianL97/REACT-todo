@@ -4,32 +4,19 @@ import Header from './components/layout/Header';
 import Todos from './components/Todos';
 import AddTodo from './components/AddTodo';
 import About from './components/pages/About';
-import uuid from 'uuid';
+import axios from 'axios';
 
 
 import './App.css';
 
 class App extends Component {
   state= {
-    todos: [
-      {
-        id: uuid.v4(),
-        title: 'Take out the trash',
-        completed: false
-      },
+    todos: []
+  }
 
-      {
-        id: uuid.v4(),
-        title: 'Dinner with wife',
-        completed: false
-      },
-
-      {
-        id: uuid.v4(),
-        title: 'Redux, Context, Apollo for app level states',
-        completed: false
-      }
-    ]
+  componentDidMount() {
+    axios.get('https://jsonplaceholder.typicode.com/todos')
+    .then(res => this.setState({todos: res.data}) )
   }
 
   markComplete = (id) => {
@@ -44,17 +31,20 @@ class App extends Component {
   }
 
   delTodo = (id) => { 
-    this.setState({ todos: [...this.state.todos.filter(todo => todo.id!== id)] });
+    axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
+      .then(res => this.setState({ todos: [...this.state.todos.filter(todo => todo.id!== id)] }));
+
+    
   }
 
   addTodo = (title) => {
-    const newTodo = {
-      id: uuid.v4(),
-      title : title,
+    axios.post('https://jsonplaceholder.typicode.com/todos', {
+      title,
       completed: false
-    }
+    })
+      .then(res => this.setState({ todos: [...this.state.todos, res.data] }));
 
-    this.setState({ todos: [...this.state.todos, newTodo] });
+    
   }
 
   render() {
